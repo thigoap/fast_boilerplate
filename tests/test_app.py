@@ -27,20 +27,12 @@ def test_create_user(client):
     }
 
 
-def test_create_user_existing_username_400(client):
-    client.post(
-        '/users',
-        json={
-            'username': 'alice',
-            'email': 'alice@example.com',
-            'password': 'secret',
-        },
-    )
+def test_create_user_existing_username_400(client, user):
     response = client.post(
         '/users',
         json={
-            'username': 'alice',
-            'email': 'other_alice@example.com',
+            'username': 'Test',
+            'email': 'other_email@example.com',
             'password': 'secret',
         },
     )
@@ -48,20 +40,12 @@ def test_create_user_existing_username_400(client):
     assert response.json() == {'detail': 'Username already exists'}
 
 
-def test_create_user_existing_email_400(client):
-    client.post(
-        '/users',
-        json={
-            'username': 'alice',
-            'email': 'alice@example.com',
-            'password': 'secret',
-        },
-    )
+def test_create_user_existing_email_400(client, user):
     response = client.post(
         '/users',
         json={
-            'username': 'other_alice',
-            'email': 'alice@example.com',
+            'username': 'other_test',
+            'email': 'email@example.com',
             'password': 'secret',
         },
     )
@@ -85,8 +69,8 @@ def test_read_user(client, user):
     response = client.get('/users/1')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'teste@test.com',
+        'username': 'Test',
+        'email': 'email@example.com',
         'id': 1,
     }
 
@@ -101,15 +85,15 @@ def test_update_user(client, user):
     response = client.put(
         '/users/1',
         json={
-            'username': 'bob',
-            'email': 'bob@example.com',
+            'username': 'user',
+            'email': 'updated@example.com',
             'password': 'mynewpassword',
         },
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'bob',
-        'email': 'bob@example.com',
+        'username': 'user',
+        'email': 'updated@example.com',
         'id': 1,
     }
 
