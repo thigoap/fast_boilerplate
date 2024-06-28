@@ -12,17 +12,20 @@ from zoneinfo import ZoneInfo
 from fast_split.database import get_session
 from fast_split.models import User
 from fast_split.schemas import TokenData
+from fast_split.settings import Settings
 
 SECRET_KEY = 'your-secret-key'  # Isso é provisório, vamos ajustar!
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = PasswordHash.recommended()
 
+settings = Settings()
+
 
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({'exp': expire})
     encoded_jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -37,7 +40,7 @@ def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 async def get_current_user(
