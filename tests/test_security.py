@@ -17,7 +17,7 @@ def test_jwt():
     assert decoded['exp']  # Testa se o valor de exp foi adicionado ao token
 
 
-def test_jwt_invalid_token(client):
+def test_jwt_invalid_token_401(client):
     response = client.delete(
         '/users/1', headers={'Authorization': 'Bearer token-invalido'}
     )
