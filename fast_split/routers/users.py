@@ -5,9 +5,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_split.database import get_session
+from fast_split.database import (
+    check_existing_users,
+    check_existing_users_patch,
+    get_session,
+)
 from fast_split.models import User
-from fast_split.schemas import Message, UserList, UserPublic, UserSchema
+from fast_split.schemas import (
+    Message,
+    UserList,
+    UserPatch,
+    UserPublic,
+    UserSchema,
+)
 from fast_split.security import (
     get_current_user,
     get_password_hash,
@@ -21,23 +31,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema, session: Session):
-    db_user = session.scalar(
-        select(User).where(
-            (User.username == user.username) | (User.email == user.email)
-        )
-    )
-
-    if db_user:
-        if db_user.username == user.username:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail='Username already exists',
-            )
-        elif db_user.email == user.email:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail='Email already exists',
-            )
+    check_existing_users(session, user)
 
     hashed_password = get_password_hash(user.password)
 
@@ -70,6 +64,30 @@ def read_user(user_id: int, session: Session):
     return db_user
 
 
+@router.patch('/{user_id}', response_model=UserPublic)
+def patch_user(
+    user_id: int,
+    user: UserPatch,
+    session: Session,
+    current_user: CurrentUser,
+):
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail='Not enough permissions'
+        )
+
+    check_existing_users_patch(session, user)
+
+    if user.username:
+        current_user.username = user.username
+    if user.password:
+        current_user.password = get_password_hash(user.password)
+    if user.email:
+        current_user.email = user.email
+
+    return current_user
+
+
 @router.put('/{user_id}', response_model=UserPublic)
 def update_user(
     user_id: int,
@@ -81,6 +99,8 @@ def update_user(
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail='Not enough permissions'
         )
+
+    check_existing_users(session, user)
 
     current_user.username = user.username
     current_user.password = get_password_hash(user.password)

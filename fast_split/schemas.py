@@ -18,6 +18,12 @@ class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserPatch(BaseModel):
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+
+
 class UserList(BaseModel):
     users: list[UserPublic]
 

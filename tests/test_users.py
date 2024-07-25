@@ -92,8 +92,56 @@ def test_update_user(client, user, token):
     }
 
 
+def test_patch_user_username(client, user, token):
+    response = client.patch(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'user',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        'username': 'user',
+        'email': user.email,
+        'id': user.id,
+    }
+
+
+def test_patch_user_email(client, user, token):
+    response = client.patch(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'email': 'updated@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        'username': user.username,
+        'email': 'updated@example.com',
+        'id': user.id,
+    }
+
+
 def test_update_user_unauthorized_400(client, user, token):
     response = client.put(
+        f'/users/{user.id + 1}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_patch_user_unauthorized_400(client, user, token):
+    response = client.patch(
         f'/users/{user.id + 1}',
         headers={'Authorization': f'Bearer {token}'},
         json={
@@ -118,6 +166,76 @@ def test_update_user_with_wrong_user_400(client, other_user, token):
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_patch_user_with_wrong_user_400(client, other_user, token):
+    response = client.patch(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_update_user_existing_username_400(client, user, token):
+    response = client.put(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': user.username,
+            'email': 'other_email@example.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Username already exists'}
+
+
+def test_patch_user_existing_username_400(client, user, token):
+    response = client.patch(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': user.username,
+            'email': 'other_email@example.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Username already exists'}
+
+
+def test_update_user_existing_email_400(client, user, token):
+    response = client.put(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'other_test',
+            'email': user.email,
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Email already exists'}
+
+
+def test_patch_user_existing_email_400(client, user, token):
+    response = client.patch(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'other_test',
+            'email': user.email,
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Email already exists'}
 
 
 def test_delete_user(client, user, token):

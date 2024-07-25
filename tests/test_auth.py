@@ -82,7 +82,7 @@ def test_token_inexistent_user_400(client):
 def test_token_wrong_password_400(client, user):
     response = client.post(
         '/auth/token',
-        data={'username': user.email, 'password': 'wrong_password'}
+        data={'username': user.email, 'password': 'wrong_password'},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {'detail': 'Incorrect email or password'}
