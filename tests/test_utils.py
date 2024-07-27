@@ -1,14 +1,11 @@
-from http import HTTPStatus
+from fast_boilerplate.utils.sanitize import sanitize
 
 
-def test_create_user_empty_string_400(client):
-    response = client.post(
-        '/users',
-        json={
-            'username': '',
-            'email': 'email@example.com',
-            'password': 'secret',
-        },
-    )
-    assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json() == {'detail': 'Empty string'}
+def test_sanitize():
+    sanitized = sanitize('user     ')
+    assert sanitized == 'user'
+
+
+def test_sanitize_empty_string():
+    sanitized = sanitize('      ')
+    assert not sanitized

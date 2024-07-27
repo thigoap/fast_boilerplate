@@ -7,17 +7,30 @@ def test_create_user(client):
     response = client.post(
         '/users',
         json={
-            'username': 'alice',
-            'email': 'alice@example.com',
+            'username': 'user',
+            'email': 'email@example.com',
             'password': 'secret',
         },
     )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
-        'username': 'alice',
-        'email': 'alice@example.com',
+        'username': 'user',
+        'email': 'email@example.com',
         'id': 1,
     }
+
+
+def test_create_user_empty_string_400(client):
+    response = client.post(
+        '/users',
+        json={
+            'username': '',
+            'email': 'email@example.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Empty string'}
 
 
 def test_create_user_existing_username_400(client, user):
@@ -124,6 +137,33 @@ def test_patch_user_email(client, user, token):
         'email': 'updated@example.com',
         'id': user.id,
     }
+
+
+def test_update_user_empty_string_400(client, user, token):
+    response = client.put(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': '     ',
+            'email': 'updated@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Empty string'}
+
+
+def test_patch_user_empty_string_400(client, user, token):
+    response = client.patch(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': '     ',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Empty string'}
 
 
 def test_update_user_unauthorized_400(client, user, token):

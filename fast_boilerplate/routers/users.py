@@ -32,8 +32,13 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema, session: Session):
-    check_existing_users(session, user)
+    if not sanitize(user.username):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Empty string',
+        )
 
+    check_existing_users(session, user)
     hashed_password = get_password_hash(user.password)
 
     db_user = User(
@@ -41,6 +46,7 @@ def create_user(user: UserSchema, session: Session):
         username=sanitize(user.username),
         password=hashed_password,
     )
+
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -77,14 +83,24 @@ def patch_user(
             status_code=HTTPStatus.BAD_REQUEST, detail='Not enough permissions'
         )
 
+    if user.username and not sanitize(user.username):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Empty string',
+        )
+
     check_existing_users_patch(session, user)
+    hashed_password = get_password_hash(user.password)
 
     if user.username:
-        current_user.username = user.username
+        current_user.username = sanitize(user.username)
     if user.password:
-        current_user.password = get_password_hash(user.password)
+        current_user.password = hashed_password
     if user.email:
         current_user.email = user.email
+
+    session.commit()
+    session.refresh(current_user)
 
     return current_user
 
@@ -101,10 +117,17 @@ def update_user(
             status_code=HTTPStatus.BAD_REQUEST, detail='Not enough permissions'
         )
 
-    check_existing_users(session, user)
+    if not sanitize(user.username):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Empty string',
+        )
 
-    current_user.username = user.username
-    current_user.password = get_password_hash(user.password)
+    check_existing_users(session, user)
+    hashed_password = get_password_hash(user.password)
+
+    current_user.username = sanitize(user.username)
+    current_user.password = hashed_password
     current_user.email = user.email
     session.commit()
     session.refresh(current_user)

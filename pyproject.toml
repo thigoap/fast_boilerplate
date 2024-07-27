@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fast-split"
+name = "fast-boilerplate"
 version = "0.1.0"
 description = ""
 authors = ["thigoap <appthigo@gmail.com>"]
@@ -30,10 +30,10 @@ pythonpath = "."
 addopts = '-p no:warnings'
 
 [tool.taskipy.tasks]
-run = 'fastapi dev fast_split/app.py'
+run = 'fastapi dev fast_boilerplate/app.py'
 
 pre_test = 'task lint'
-test = 'pytest --cov=fast_split -vv'
+test = 'pytest --cov=fast_boilerplate -vv'
 post_test = 'coverage html'
 
 lint = 'ruff check . && ruff check . --diff'
