@@ -9,10 +9,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from zoneinfo import ZoneInfo
 
-from fast_split.database import get_session
-from fast_split.models import User
-from fast_split.schemas import TokenData
-from fast_split.settings import Settings
+from fast_boilerplate.database import get_session
+from fast_boilerplate.models import User
+from fast_boilerplate.schemas import TokenData
+from fast_boilerplate.settings import Settings
 
 pwd_context = PasswordHash.recommended()
 

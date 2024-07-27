@@ -5,23 +5,24 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_split.database import (
+from fast_boilerplate.database import (
     check_existing_users,
     check_existing_users_patch,
     get_session,
 )
-from fast_split.models import User
-from fast_split.schemas import (
+from fast_boilerplate.models import User
+from fast_boilerplate.schemas import (
     Message,
     UserList,
     UserPatch,
     UserPublic,
     UserSchema,
 )
-from fast_split.security import (
+from fast_boilerplate.security import (
     get_current_user,
     get_password_hash,
 )
+from fast_boilerplate.utils.sanitize import sanitize
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -37,7 +38,7 @@ def create_user(user: UserSchema, session: Session):
 
     db_user = User(
         email=user.email,
-        username=user.username,
+        username=sanitize(user.username),
         password=hashed_password,
     )
     session.add(db_user)

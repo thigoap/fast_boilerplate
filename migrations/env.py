@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from fast_split.models import table_registry
-from fast_split.settings import Settings
+from fast_boilerplate.models import table_registry
+from fast_boilerplate.settings import Settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

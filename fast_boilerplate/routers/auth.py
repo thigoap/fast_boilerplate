@@ -6,10 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from fast_split.database import get_session
-from fast_split.models import User
-from fast_split.schemas import Token
-from fast_split.security import (
+from fast_boilerplate.database import get_session
+from fast_boilerplate.models import User
+from fast_boilerplate.schemas import Token
+from fast_boilerplate.security import (
     create_access_token,
     get_current_user,
     verify_password,

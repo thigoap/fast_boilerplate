@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fast_split.schemas import UserPublic
+from fast_boilerplate.schemas import UserPublic
 
 
 def test_create_user(client):

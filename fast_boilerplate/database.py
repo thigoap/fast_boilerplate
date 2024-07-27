@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from fast_split.models import User
-from fast_split.settings import Settings
+from fast_boilerplate.models import User
+from fast_boilerplate.settings import Settings
 
 engine = create_engine(Settings().DATABASE_URL)
 

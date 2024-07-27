@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from fast_split.models import User
+from fast_boilerplate.models import User
 
 
 def test_create_user(session):

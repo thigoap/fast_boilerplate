@@ -5,10 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
-from fast_split.app import app
-from fast_split.database import get_session
-from fast_split.models import User, table_registry
-from fast_split.security import get_password_hash
+from fast_boilerplate.app import app
+from fast_boilerplate.database import get_session
+from fast_boilerplate.models import User, table_registry
+from fast_boilerplate.security import get_password_hash
 
 
 class UserFactory(factory.Factory):

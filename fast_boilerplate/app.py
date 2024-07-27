@@ -2,8 +2,8 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
-from fast_split.routers import auth, users
-from fast_split.schemas import Message
+from fast_boilerplate.routers import auth, users
+from fast_boilerplate.schemas import Message
 
 app = FastAPI()
 
